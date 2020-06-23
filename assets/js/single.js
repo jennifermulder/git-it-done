@@ -1,4 +1,5 @@
 var issueContainerEl = document.querySelector("#issues-container");
+var limitWarningEl = document.querySelector("#limit-warning");
 
 //takes repo name as a parameter, when you call the function and add the repo name, name is passed through the function
 var getRepoIssues = function (repo) {
@@ -13,6 +14,12 @@ var getRepoIssues = function (repo) {
                 //console.log(data); ------ to see dom JSON data
                 // pass response data to dom function (passed into displayIssues function)
                 displayIssues(data);
+
+                // check if api has paginated issues
+                if (response.headers.get("Link")) {
+                    //call to display warning function
+                    displayWarning(repo)                    
+                }
             });
         }
         else {
@@ -21,7 +28,7 @@ var getRepoIssues = function (repo) {
     });
 };
 
-getRepoIssues("jennifermulder/taskinator");
+getRepoIssues("facebook/react");
 
 var displayIssues = function (issues) {
     if (issues.length === 0) {
@@ -58,4 +65,17 @@ var displayIssues = function (issues) {
 
         issueContainerEl.appendChild(issueEl);
     }
+};
+
+var displayWarning = function (repo) {
+    // add text to warning container
+    limitWarningEl.textContent = "To see more than 30 issues, visit ";
+
+    var linkEl = document.createElement("a");
+    linkEl.textContent = "See More Issues on GitHub.com";
+    linkEl.setAttribute("href", "https://github.com/" + repo + "/issues");
+    linkEl.setAttribute("target", "_blank");
+
+    // append to warning container
+    limitWarningEl.appendChild(linkEl);
 };
