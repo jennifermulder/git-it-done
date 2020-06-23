@@ -4,21 +4,24 @@ var repoContainerEl = document.querySelector("#repos-container");
 var repoSearchTerm = document.querySelector("#repo-search-term");
 
 var getUserRepos = function (user) {
-    // format the github api url
+    // format the github api url - SPECIFICALLY REQUESTING REPOS
     var apiUrl = "https://cors-anywhere.herokuapp.com/https://api.github.com/users/" + user + "/repos";
 
-    // make a request to the url
+    // make a request to the url (like manually inputting it)
     fetch(apiUrl)
         .then(function (response) {
-            // request was successful
+            // if request was successful and worked, pull repo and input
             if (response.ok) {
+                //pull the response in json, pass data into the function, data = repos, user = search term
                 response.json().then(function (data) {
                     displayRepos(data, user);
                 });
+            //if false, display error presented as part of console error
             } else {
                 alert("Error: " + response.statusText);
             }
         })
+        // incase theres any issues with the request
         .catch(function (error) {
             // Notice this `.catch()` getting chained onto the end of the `.then()` method
             alert("Unable to connect to GitHub");
@@ -46,10 +49,11 @@ var displayRepos = function (repos, searchTerm) {
         repoContainerEl.textContent = "No repositories found.";
         return;
     }
-    // console.log(repos);
+    console.log(repos);
     // console.log(searchTerm);
     // clear old content
     repoContainerEl.textContent = "";
+    //set to the same name as the search Term
     repoSearchTerm.textContent = searchTerm;
     // loop over repos
     for (var i = 0; i < repos.length; i++) {
