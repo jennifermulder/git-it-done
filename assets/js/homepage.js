@@ -2,6 +2,7 @@ var userFormEl = document.querySelector("#user-form");
 var nameInputEl = document.querySelector("#username");
 var repoContainerEl = document.querySelector("#repos-container");
 var repoSearchTerm = document.querySelector("#repo-search-term");
+var languageButtonsEl = document.querySelector("#language-buttons");
 
 var getUserRepos = function (user) {
     // format the github api url - SPECIFICALLY REQUESTING REPOS
@@ -93,4 +94,41 @@ var displayRepos = function (repos, searchTerm) {
     }
 };
 
+//passing the language parameter into the function so that when its searched it can we added to the URL search
+var getFeaturedRepos = function(language) {
+    var apiUrl = "https://api.github.com/search/repositories?q=" + language + "+is:featured&sort=help-wanted-issues";
+  
+    fetch(apiUrl).then(function(response) {
+        if (response.ok) {
+            //extract the JSON from the response
+            response.json().then(function(data) {
+                //logging the data from the response (the response is everything that is returned)
+                //console.log(data)
+                //passing response -> data -> items into the displayRepos function. Display repos function itself, pulls based on what its being told to pull, here
+                displayRepos(data.items, language);
+            });
+        } else {
+          alert("Error: " + response.statusText);
+        }
+      });
+  };
+
+//looks for event (button click event listener below, when you click on a language button)
+var buttonClickHandler = function(event) {
+    //identifies the target of the event (what was clicked on) and gets value of that "data-language" attribute
+    var language = event.target.getAttribute("data-language")
+    //value that is retrieved
+    //console.log(language);
+    if (language) {
+        //pass this specified language into the getFeaturedRepos function (use as input)
+        getFeaturedRepos(language);
+      
+        // clear old content (clears it first - asynchronous)
+        repoContainerEl.textContent = "";
+      }
+}
+
+
 userFormEl.addEventListener("submit", formSubmitHandler);
+
+languageButtonsEl.addEventListener("click", buttonClickHandler);
